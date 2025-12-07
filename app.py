@@ -1,6 +1,9 @@
 import streamlit as st
 import asyncio
+import nest_asyncio
 from langchain_mcp_adapters import MultiServerMCPClient
+
+nest_asyncio.apply()
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -12,7 +15,7 @@ load_dotenv()
 api_key = os.getenv("google_api_key")
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash-lite",
     temperature=0,
     max_tokens=None,
     timeout=None,
@@ -40,9 +43,9 @@ async def setup_graph():
             return "tool_node"
         return END
 
-    async def call_model(state: MessagesState):
+    def call_model(state: MessagesState):
         messages = state["messages"]
-        response = await model_with_tools.ainvoke(messages)
+        response = model_with_tools.invoke(messages)
         return {"messages": [response]}
 
     builder = StateGraph(MessagesState)

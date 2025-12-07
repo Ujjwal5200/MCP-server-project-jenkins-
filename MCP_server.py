@@ -9,7 +9,7 @@ load_dotenv()
 api_key = os.getenv("google_api_key")
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-live",
+    model="gemini-2.5-flash-lite",
     temperature=0,
     max_tokens=None,
     timeout=None,
@@ -68,12 +68,12 @@ async def code_generation(query: str) -> str:
 
     # Prompt engineering as recommended by AI code generation experts.
     prompt = (
-        "Act as an expert Python developer.\n"
+        "Act as an expert and experienced Python developer with access to the latest libraries and best practices and tools.\n"
         "Generate code with precise logic. "
         "Add comprehensive inline comments for clarity, "
         "list required import statements, "
         "and ensure the code has no syntax errors.\n"
-        "Deliver the code as a complete, runnable snippet ready for copy-pasting.\n"
+        
     )
     full_query = f"{prompt}{query}"
     response = await model.ainvoke(full_query)
@@ -89,13 +89,13 @@ async def code_generation(query: str) -> str:
 @mcp.tool()
 async def webcode_generation(query: str) -> str:
     """
-    Generate robust web development code in one file with comments and all necessary imports.
+    Generate robust web development code  with comments and all necessary imports.
 
     Args:
         query (str): User's web application description.
 
     Returns:
-        str: Web code (e.g., for Flask, Django, FastAPI, or JS frameworks) fully commented and import-ready.
+        str: Web code (e.g., for Flask, streamlit, html, css, etc.) fully commented and import-ready.
     
     Raises:
         ValueError: If the query is not a non-empty string.
@@ -105,11 +105,11 @@ async def webcode_generation(query: str) -> str:
 
     # Prompt is precisely engineered for web code generation.
     prompt = (
-        "Act as a senior web developer.\n"
+        "Act as a seniorand experienced web developer.\n"
         "Write the required code with correct logic and comments, "
-        "put all logic in a single file for direct copy-paste use, "
+        "put all logic in a single snippet, "
         "and list every required import.\n"
-        "Make sure the generated web app runs without syntax errors and is easy to test.\n"
+        "Make sure the genrated code has no syntax errors.\n"
     )
     full_query = f"{prompt}{query}"
     response = await model.ainvoke(full_query)
