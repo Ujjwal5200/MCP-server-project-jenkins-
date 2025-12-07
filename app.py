@@ -78,7 +78,7 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
-    st.title("🤖 MCP AI Assistant")
+    st.title("🤖  AI Assistant")
     st.markdown("An AI assistant powered by LangGraph and Google Gemini, integrated with MCP tools.")
     st.markdown("---")
     if st.button("🗑️ Clear Chat"):
@@ -91,7 +91,7 @@ with st.sidebar:
     st.markdown("- Access to MCP tools for enhanced capabilities")
     st.markdown("- Powered by Gemini 2.5 Flash")
 
-st.title("💬 MCP AI Assistant")
+st.title("🤖 NEXUS")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -103,8 +103,8 @@ if "graph" not in st.session_state:
 if not st.session_state.messages:
     st.markdown("""
     <div style="text-align: center; padding: 50px;">
-        <h2>Welcome to MCP AI Assistant! 👋</h2>
-        <p>Start a conversation by typing a message below. I can help with various tasks using integrated tools.</p>
+        <h2>Welcome to nexus, your AI assistant! 👋</h2>
+        <p>Start a conversation by typing a message below. I can help with various tasks using integrated tools .</p>
     </div>
     """, unsafe_allow_html=True)
 
