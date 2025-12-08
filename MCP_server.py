@@ -95,7 +95,7 @@ async def webcode_generation(query: str) -> str:
         query (str): User's web application description.
 
     Returns:
-        str: Web code (e.g., for Flask, streamlit, html, css, etc.) fully commented and import-ready.
+        str: Web code  for  website in (html,css,js) fully commented and import-ready.
     
     Raises:
         ValueError: If the query is not a non-empty string.
@@ -105,9 +105,9 @@ async def webcode_generation(query: str) -> str:
 
     # Prompt is precisely engineered for web code generation.
     prompt = (
-        "Act as a seniorand experienced web developer.\n"
+        "Act as a senior and experienced web developer.\n"
         "Write the required code with correct logic and comments, "
-        "put all logic in a single snippet, "
+        "put all code in single snippet "
         "and list every required import.\n"
         "Make sure the genrated code has no syntax errors.\n"
     )
