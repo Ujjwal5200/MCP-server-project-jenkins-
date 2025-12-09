@@ -288,7 +288,7 @@ if not st.session_state.messages:
     st.markdown("""
     <div style="text-align: center; padding: 50px;">
         <h3>Welcome to nexus, your AI assistant! 👋</h3>
-        <p>Start a conversation by typing a message below. I can help with various tasks using integrated tools .</p>
+        <p>Start a conversation by typing a message below. I can help with various tasks using integrated MCP tools .</p>
     </div>
     """, unsafe_allow_html=True)
 
