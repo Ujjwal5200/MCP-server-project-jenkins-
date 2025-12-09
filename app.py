@@ -259,7 +259,9 @@ with st.sidebar:
     st.markdown("**Features:**")
     st.markdown("- Chat with AI using natural language")
     st.markdown("- Access to MCP tools for enhanced capabilities")
+    st.markdown("- CICD and managed by Jenkins")
     st.markdown("- Powered by Gemini 2.5 Flash")
+    st.markdown("- MADE BY UJJWAL KAUSHIK")
 
 st.markdown("""
 <div style="text-align: center; margin-bottom: 20px;">
