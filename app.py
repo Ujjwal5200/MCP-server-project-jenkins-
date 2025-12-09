@@ -1,7 +1,7 @@
 import streamlit as st
 import asyncio
 import nest_asyncio
-from langchain_mcp_adapters import MultiServerMCPClient
+from langchain_mcp_adapters.client import MultiServerMCPClient
 
 nest_asyncio.apply()
 from langgraph.graph import StateGraph, MessagesState, START, END
