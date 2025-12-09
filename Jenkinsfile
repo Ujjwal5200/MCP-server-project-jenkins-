@@ -1,15 +1,29 @@
 pipeline {
     agent any
 
-    // Load Gemini key from Jenkins Credentials
     environment {
         GEMINI_API_KEY = credentials('GEMINI_API_KEY')
     }
 
     stages {
+        stage('Install Docker if needed') {
+            steps {
+                sh '''
+                if ! command -v docker >/dev/null 2>&1; then
+                  echo "Docker not found, installing..."
+                  sudo apt-get update -y
+                  sudo apt-get install -y docker.io
+                  sudo systemctl enable docker || true
+                  sudo systemctl start docker || true
+                else
+                  echo "Docker already installed"
+                fi
+                '''
+            }
+        }
+
         stage('Checkout') {
             steps {
-                // Use your repo URL
                 git branch: 'main', url: 'https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git'
             }
         }
@@ -37,3 +51,4 @@ pipeline {
         }
     }
 }
+
