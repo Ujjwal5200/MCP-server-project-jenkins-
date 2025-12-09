@@ -1,15 +1,18 @@
 import streamlit as st
 import asyncio
 import nest_asyncio
-from langchain_mcp_adapters.client import MultiServerMCPClient
 
-nest_asyncio.apply()
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
+
 import os
 from dotenv import load_dotenv
+
+nest_asyncio.apply()
+
 
 # Theme configuration
 THEMES = {
