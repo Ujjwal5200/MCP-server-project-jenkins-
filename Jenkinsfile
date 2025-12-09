@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    // Load Gemini key from Jenkins Credentials
-    environment {
-        GEMINI_API_KEY = credentials('GEMINI_API_KEY')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -13,25 +8,30 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
+        stage('Build & Deploy Docker') {
             steps {
-                sh 'docker build -t mcp-streamlit-app .'
-            }
-        }
+                withCredentials([string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')]) {
+                    sh '''
+                        echo "=== Creating .env for app ==="
+                        cat > .env <<EOF
+GOOGLE_API_KEY=${GEMINI_API_KEY}
+GEMINI_API_KEY=${GEMINI_API_KEY}
+EOF
 
-        stage('Deploy') {
-            steps {
-                sh '''
-                # Stop and remove old container if exists
-                docker rm -f mcp-streamlit-app || true
+                        echo "=== Building Docker image ==="
+                        docker build -t mcp-streamlit-app .
 
-                # Run new container
-                docker run -d \
-                  --name mcp-streamlit-app \
-                  -p 8501:8501 \
-                  -e google_api_key=$GEMINI_API_KEY \
-                  mcp-streamlit-app
-                '''
+                        echo "=== Stopping old container (if exists) ==="
+                        docker stop mcp-streamlit-app || true
+                        docker rm mcp-streamlit-app || true
+
+                        echo "=== Running new container ==="
+                        docker run -d --name mcp-streamlit-app \
+                          -p 80:8501 \
+                          --env-file .env \
+                          mcp-streamlit-app
+                    '''
+                }
             }
         }
     }
