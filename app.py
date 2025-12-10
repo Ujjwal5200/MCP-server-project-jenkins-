@@ -260,7 +260,7 @@ with st.sidebar:
     st.markdown("- Chat with AI using natural language")
     st.markdown("- Access to MCP tools for enhanced capabilities")
     st.markdown("- CICD and managed by Jenkins")
-    st.markdown("- Powered by Gemini 2.5 Flash")
+    st.markdown("- Powered by Gemini 2.5 Flash & AWS")
     st.markdown("- MADE BY UJJWAL KAUSHIK")
 
 st.markdown("""
