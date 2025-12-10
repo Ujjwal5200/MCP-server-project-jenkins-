@@ -36,5 +36,9 @@ EOF
                           -p 80:8501 \
                           --env-file .env \
                           mcp-streamlit-app
+                    '''
+                }
+            }
+        }
     }
 }
