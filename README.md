@@ -204,7 +204,7 @@ To set up the CI/CD pipeline:
 ### Math Operations
 - "What is 15 + 27?"
 - "Calculate 100 divided by 5"
-- "Multiply 8 by 9"
+- "Multiply 8 by 9 " 
 
 ### Code Generation
 - "Generate a Python function to sort a list"
