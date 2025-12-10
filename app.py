@@ -1,15 +1,18 @@
 import streamlit as st
 import asyncio
 import nest_asyncio
-from langchain_mcp_adapters import MultiServerMCPClient
 
-nest_asyncio.apply()
+from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
+
 import os
 from dotenv import load_dotenv
+
+nest_asyncio.apply()
+
 
 # Theme configuration
 THEMES = {
@@ -150,7 +153,7 @@ st.markdown(f"""
     }}
 
     .stSpinner {{
-        animation: spin 1s linear infinite;
+        animation: 1s linear infinite;
     }}
 
     @keyframes fadeIn {{
@@ -160,7 +163,7 @@ st.markdown(f"""
 
     @keyframes spin {{
         0% {{ transform: rotate(0deg); }}
-        100% {{ transform: rotate(360deg); }}
+        100% {{ transform: rotate(0deg); }}
     }}
 
     /* Particle effect for futuristic look */
@@ -256,7 +259,9 @@ with st.sidebar:
     st.markdown("**Features:**")
     st.markdown("- Chat with AI using natural language")
     st.markdown("- Access to MCP tools for enhanced capabilities")
-    st.markdown("- Powered by Gemini 2.5 Flash")
+    st.markdown("- CICD and managed by Jenkins")
+    st.markdown("- Powered by Gemini 2.5 Flash & AWS")
+    st.markdown("- MADE BY UJJWAL KAUSHIK")
 
 st.markdown("""
 <div style="text-align: center; margin-bottom: 20px;">
@@ -288,7 +293,7 @@ if not st.session_state.messages:
     st.markdown("""
     <div style="text-align: center; padding: 50px;">
         <h3>Welcome to nexus, your AI assistant! 👋</h3>
-        <p>Start a conversation by typing a message below. I can help with various tasks using integrated tools .</p>
+        <p>Start a conversation by typing a message below. I can help with various tasks using integrated MCP tools .</p>
     </div>
     """, unsafe_allow_html=True)
 
