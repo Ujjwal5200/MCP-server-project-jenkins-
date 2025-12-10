@@ -223,7 +223,7 @@ To set up the CI/CD pipeline:
 - `langgraph`: Workflow orchestration
 - `python-dotenv`: Environment variable management
 - `mcp`: Model Context Protocol library
-- `nest-asyncio`: Asyncio compatibility
+- `nest-asyncio`: Asyncio compatibility.
 
 ## 🤝 Contributing
 
