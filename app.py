@@ -322,5 +322,15 @@ if query:
         result = asyncio.run(st.session_state.graph.ainvoke({"messages": st.session_state.messages}))
         ai_response = result["messages"][-1]
         st.session_state.messages.append(ai_response)
-        st.chat_message("assistant").write(ai_response.content)
+        # Debug: Check if response content is present
+        if ai_response.content and len(ai_response.content.strip()) > 0:
+            # For long responses, use an expandable container to prevent rendering issues
+            if len(ai_response.content) > 2000:  # Adjust threshold as needed
+                with st.chat_message("assistant"):
+                    with st.expander("AI Response (Click to expand)", expanded=False):
+                        st.write(ai_response.content)
+            else:
+                st.chat_message("assistant").write(ai_response.content)
+        else:
+            st.chat_message("assistant").write("Sorry, I couldn't generate a response. Please try again.")
         st.rerun()

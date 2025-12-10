@@ -18,27 +18,104 @@ A powerful AI assistant application built with Streamlit, LangGraph, and Google 
 - **Customizable Themes**: Dark and light themes with futuristic UI animations
 - **Docker Support**: Containerized deployment for easy scalability
 - **CI/CD Pipeline**: Automated build and deployment via Jenkins and GitHub Actions
+- **AWS Hosting**: Deployed on Amazon Web Services for scalable and reliable cloud infrastructure
 
 ## 🏗️ Architecture
 
-The application consists of three main components:
+The MCP AI Assistant follows a modular, microservices-inspired architecture designed for scalability, maintainability, and seamless AI integration. The system employs a layered approach that separates concerns between user interface, business logic orchestration, and external service integrations.
 
-### 1. Streamlit App (`app.py`)
-- Frontend chat interface with custom themes and animations
-- Manages user interactions and displays conversation history
-- Integrates with LangGraph for AI processing
-- Responsive design for mobile and desktop
+### System Overview
 
-### 2. MCP Server (`MCP_server.py`)
-- FastMCP-based server providing specialized tools
-- Math tools: `add`, `sub`, `mul`, `div`
-- Code generation tools: `code_generation`, `webcode_generation`
-- General query handling with `normal_query`
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Streamlit UI  │◄──►│  LangGraph       │◄──►│   MCP Server    │
+│   (Frontend)    │    │  Orchestrator    │    │   (Tools)       │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 ▼
+                    ┌─────────────────────┐
+                    │  Google Gemini AI   │
+                    │     (LLM Model)     │
+                    └─────────────────────┘
+```
 
-### 3. LangGraph Client (`client_langraph.py`)
-- Standalone client demonstrating MCP server integration
-- Shows how to set up and use the MCP tools with LangGraph
-- Example usage for testing and development
+### Core Components
+
+#### 1. Streamlit Frontend (`app.py`)
+- **Role**: User interface and interaction management
+- **Features**:
+  - Responsive chat interface with dark/light theme support
+  - Real-time message handling with asynchronous processing
+  - Custom CSS animations and particle effects for enhanced UX
+  - Session state management for conversation persistence
+  - Mobile-first responsive design with adaptive layouts
+
+#### 2. LangGraph Orchestrator (`client_langraph.py`)
+- **Role**: Workflow engine and AI model coordination
+- **Features**:
+  - Graph-based state management for complex conversation flows
+  - Conditional routing between direct AI responses and tool execution
+  - Asynchronous processing with asyncio for concurrent operations
+  - Tool binding and execution orchestration
+  - Error handling and retry logic for robust operation
+
+#### 3. MCP Server (`MCP_server.py`)
+- **Role**: Specialized tool provider using Model Context Protocol
+- **Tools Available**:
+  - **Math Operations**: `add`, `subtract`, `multiply`, `divide` - Precise arithmetic calculations
+  - **Code Generation**: `code_generation` (Python), `webcode_generation` (HTML/CSS/JS) - AI-powered code creation with comments and imports
+  - **General Queries**: `normal_query` - Fallback for non-specialized conversations
+- **Features**:
+  - FastMCP framework for efficient tool execution
+  - Input validation and error handling
+  - Asynchronous tool processing for performance
+
+#### 4. Google Gemini Integration
+- **Role**: Large Language Model backend
+- **Configuration**:
+  - Gemini 2.5 Flash Lite model for optimal performance/cost balance
+  - Configurable temperature, token limits, and retry mechanisms
+  - Secure API key management via environment variables
+
+### Data Flow
+
+1. **User Input** → Streamlit UI captures and displays messages
+2. **Processing** → LangGraph evaluates context and determines tool needs
+3. **Tool Execution** → MCP Server provides specialized capabilities when required
+4. **AI Response** → Google Gemini generates contextual responses
+5. **Output** → Results flow back through LangGraph to Streamlit for display
+
+### CI/CD and Deployment Overview
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────────┐     ┌─────────────┐
+│   GitHub    │────►│   Jenkins   │────►│  Docker Registry │────►│     AWS     │
+│ Repository  │     │   Pipeline  │     │                 │     │ Deployment  │
+└─────────────┘     └─────────────┘     └─────────────────┘     └─────────────┘
+       ▲                   │                       │                       │
+       │                   ▼                       ▼                       ▼
+       └─────────── Test Results ────────── Build Artifacts ──────── Production ───────
+```
+
+### Deployment Architecture
+
+- **Containerization**: Docker-based deployment for consistent environments across development, staging, and production
+- **CI/CD Pipeline**:
+  - **Jenkins**: Orchestrates the entire CI/CD process with automated triggers from GitHub
+  - **GitHub Integration**: Webhooks trigger Jenkins pipelines on code pushes and pull requests
+  - **Automated Testing**: Unit tests, integration tests, and security scans run in isolated containers
+  - **Build Process**: Docker images are built, tagged, and pushed to secure registry
+  - **Deployment**: Automated rollout to AWS with blue-green deployment strategy
+- **AWS Infrastructure**:
+  - **ECS/ECR**: Container orchestration and registry for scalable container management
+  - **Load Balancing**: Application Load Balancer distributes traffic across multiple instances
+  - **Auto Scaling**: EC2 Auto Scaling groups ensure high availability and cost optimization
+  - **RDS**: Managed database services for data persistence (if needed)
+  - **CloudWatch**: Monitoring and logging for performance metrics and alerts
+  - **VPC**: Secure network isolation with proper security groups and subnets
+- **Environment Management**: Secure configuration using AWS Systems Manager Parameter Store and `.env` files
+- **Security**: IAM roles, encrypted secrets, and compliance with AWS security best practices
 
 ## 📋 Prerequisites
 
