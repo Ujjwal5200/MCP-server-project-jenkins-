@@ -7,6 +7,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
+from google.generativeai.exceptions import ResourceExhausted
 
 import os
 from dotenv import load_dotenv
@@ -68,8 +69,12 @@ async def setup_graph():
 
     def call_model(state: MessagesState):
         messages = state["messages"]
-        response = model_with_tools.invoke(messages)
-        return {"messages": [response]}
+        try:
+            response = model_with_tools.invoke(messages)
+            return {"messages": [response]}
+        except ResourceExhausted:
+            error_message = AIMessage(content="Free AI quota exhausted for today, try again tomorrow 🫠")
+            return {"messages": [error_message]}
 
     builder = StateGraph(MessagesState)
     builder.add_node("call_model", call_model)

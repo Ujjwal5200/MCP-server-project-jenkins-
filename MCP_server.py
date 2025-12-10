@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 from langchain_google_genai import ChatGoogleGenerativeAI
+from google.generativeai.exceptions import ResourceExhausted
 import os
 from dotenv import load_dotenv
 import asyncio
@@ -23,12 +24,15 @@ mcp = FastMCP("math")
 
 
 
-# tool for general query of user operation 
+# tool for general query of user operation
 @mcp.tool()
 async def normal_query(query: str) -> str:
     """Handle general queries or the task that user ask with precision(essay,story,facts,questions,summary,reasoning) ect"""
-    response = await model.ainvoke(query)
-    return response.content
+    try:
+        response = await model.ainvoke(query)
+        return response.content
+    except ResourceExhausted:
+        return "Free AI quota exhausted for today, try again tomorrow 🫠"
 
 
 
@@ -60,17 +64,23 @@ async def math_generation(query: str) -> str:
         
     )
     full_query = f"{prompt}{query}"
-    response = await model.ainvoke(full_query)
-    # Basic length validation for output (optional but helps detect model failures)
-    if not response or len(response.content.strip()) < 10:
-        raise RuntimeError("Generated code is unexpectedly short.")
-    return response.content 
+    try:
+        response = await model.ainvoke(full_query)
+        # Basic length validation for output (optional but helps detect model failures)
+        if not response or len(response.content.strip()) < 10:
+            raise RuntimeError("Generated code is unexpectedly short.")
+        return response.content
+    except ResourceExhausted:
+        return "Free AI quota exhausted for today, try again tomorrow 🫠"
 
 @mcp.tool()
 async def normal_query(query: str) -> str:
     """Handle general queries that are  math-related"""
-    response = await model.ainvoke(query)
-    return response.content
+    try:
+        response = await model.ainvoke(query)
+        return response.content
+    except ResourceExhausted:
+        return "Free AI quota exhausted for today, try again tomorrow 🫠"
 
 
 
@@ -103,11 +113,14 @@ async def code_generation(query: str) -> str:
         
     )
     full_query = f"{prompt}{query}"
-    response = await model.ainvoke(full_query)
-    # Basic length validation for output (optional but helps detect model failures)
-    if not response or len(response.content.strip()) < 10:
-        raise RuntimeError("Generated code is unexpectedly short.")
-    return response.content
+    try:
+        response = await model.ainvoke(full_query)
+        # Basic length validation for output (optional but helps detect model failures)
+        if not response or len(response.content.strip()) < 10:
+            raise RuntimeError("Generated code is unexpectedly short.")
+        return response.content
+    except ResourceExhausted:
+        return "Free AI quota exhausted for today, try again tomorrow 🫠"
 
 
 

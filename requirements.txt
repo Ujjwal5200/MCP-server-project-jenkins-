@@ -2,6 +2,7 @@ streamlit
 nest-asyncio
 python-dotenv
 langchain-google-genai
+google-generativeai
 langchain-mcp-adapters
 langgraph
 mcp
