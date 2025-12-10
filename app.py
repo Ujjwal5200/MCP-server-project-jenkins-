@@ -153,7 +153,7 @@ st.markdown(f"""
     }}
 
     .stSpinner {{
-        animation: spin 1s linear infinite;
+        animation: 1s linear infinite;
     }}
 
     @keyframes fadeIn {{
@@ -163,7 +163,7 @@ st.markdown(f"""
 
     @keyframes spin {{
         0% {{ transform: rotate(0deg); }}
-        100% {{ transform: rotate(360deg); }}
+        100% {{ transform: rotate(0deg); }}
     }}
 
     /* Particle effect for futuristic look */
