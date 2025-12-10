@@ -1,6 +1,10 @@
 # MCP AI Assistant
 
-A powerful AI assistant application built with Streamlit, LangGraph, and Google Gemini, featuring an MCP (Model Context Protocol) server that provides specialized tools for math operations and code generation.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io/)
+
+A powerful AI assistant application built with Streamlit, LangGraph, and Google Gemini, featuring an MCP (Model Context Protocol) server that provides specialized tools for math operations and code generation. This project is built and managed using Jenkins with GitHub CI/CD for automated testing, building, and deployment.
 
 ## 🚀 Features
 
@@ -11,16 +15,19 @@ A powerful AI assistant application built with Streamlit, LangGraph, and Google 
 - **LangGraph Workflow**: Orchestrates AI model calls and tool executions using LangGraph
 - **Google Gemini Integration**: Leverages Gemini 2.5 Flash Lite for high-quality AI responses
 - **Asynchronous Processing**: Efficient handling of concurrent operations using asyncio
+- **Customizable Themes**: Dark and light themes with futuristic UI animations
+- **Docker Support**: Containerized deployment for easy scalability
+- **CI/CD Pipeline**: Automated build and deployment via Jenkins and GitHub Actions
 
 ## 🏗️ Architecture
 
 The application consists of three main components:
 
 ### 1. Streamlit App (`app.py`)
-- Frontend chat interface
+- Frontend chat interface with custom themes and animations
 - Manages user interactions and displays conversation history
 - Integrates with LangGraph for AI processing
-- Custom CSS styling for enhanced user experience
+- Responsive design for mobile and desktop
 
 ### 2. MCP Server (`MCP_server.py`)
 - FastMCP-based server providing specialized tools
@@ -36,8 +43,8 @@ The application consists of three main components:
 ## 📋 Prerequisites
 
 - Python 3.8+
+- Docker (optional, for containerized deployment)
 - Google Gemini API key
-- Required Python packages (see Dependencies section)
 
 ## 🛠️ Installation
 
@@ -92,6 +99,29 @@ python MCP_server.py
 python client_langraph.py
 ```
 
+### Docker Deployment
+
+Build and run the application using Docker:
+
+```bash
+docker build -t mcp-ai-assistant .
+docker run -p 8501:8501 --env-file .env mcp-ai-assistant
+```
+
+## 🔄 CI/CD Pipeline
+
+This project utilizes Jenkins integrated with GitHub for continuous integration and deployment:
+
+- **Automated Testing**: Jenkins runs unit tests and integration tests on every push to the main branch
+- **Build Process**: Docker images are built and pushed to a container registry
+- **Deployment**: Automated deployment to staging and production environments
+- **Monitoring**: Pipeline status and logs are monitored via Jenkins dashboard
+
+To set up the CI/CD pipeline:
+1. Configure Jenkins with GitHub webhooks for automatic triggering
+2. Set up necessary credentials and environment variables in Jenkins
+3. Use the provided Jenkinsfile for pipeline configuration
+
 ## 💡 Examples
 
 ### Math Operations
@@ -136,6 +166,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - LangChain and LangGraph for orchestration
 - Streamlit for the web interface
 - MCP community for the protocol specification
+- Jenkins and GitHub for CI/CD infrastructure
 
 ## 📞 Support
 
