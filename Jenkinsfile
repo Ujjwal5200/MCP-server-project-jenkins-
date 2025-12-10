@@ -15,9 +15,6 @@ pipeline {
                         echo "=== Checking system resources ==="
                         free -h
 
-                        echo "=== Updating package list ==="
-                        sudo apt-get update
-
                         echo "=== Creating .env for app ==="
                         cat > .env <<EOF
 GOOGLE_API_KEY=${GEMINI_API_KEY}
