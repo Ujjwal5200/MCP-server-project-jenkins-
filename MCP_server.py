@@ -27,7 +27,7 @@ mcp = FastMCP("math")
 # tool for general query of user operation
 @mcp.tool()
 async def normal_query(query: str) -> str:
-    """Handle general queries or the task that user ask with precision(essay,story,facts,questions,summary,reasoning) ect"""
+    """Handle general queries or the task that user ask with precision(essay,story,facts,questions,summary,reasoning) etc tasks."""
     try:
         response = await model.ainvoke(query)
         return response.content
