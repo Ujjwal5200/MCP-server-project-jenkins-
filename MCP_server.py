@@ -20,28 +20,50 @@ mcp = FastMCP("math")
 
 # tool for maths operation 
 @mcp.tool()
-def add(a: int, b: int) -> int:
-    "add two numbers"
-    return a + b
+async def normal_query(query: str) -> str:
+    """Handle general queries or the task that user ask with precision"""
+    response = await model.ainvoke(query)
+    return response.content
+
+
+
+  # Always mention necessary imports
 
 @mcp.tool()
-def sub(a: int, b: int) -> int:
-    "subtract two numbers"
-    return a - b
+async def math_generation(query: str) -> str:
+    """
+    Generate clean, well-commented  maths ans with explaination .
 
-@mcp.tool()
-def mul(a: int, b: int) -> int:
-    "multiply two numbers"
-    return a * b
+    Args:
+        query (str): User's description for desired math operation.
 
-@mcp.tool()
-def div(a: int, b: int) -> float:
-    "divide two numbers"
-    return a / b   
+    Returns:
+        str: Generated ans  with comments and explanation.
+    
+    Raises:
+        ValueError: If the query is empty.
+    """
+    if not query or not isinstance(query, str):
+        raise ValueError("Query must be a non-empty string.")
+
+    # Prompt engineering as recommended by AI code generation experts.
+    prompt = (
+        "Act as an expert and experienced math resaercher with access to the latest libraries and best practices and tools.\n"
+        "Generate logic with precise logic. "
+        "Add comprehensive inline comments for clarity, "
+        "and ensure the code has no syntax errors.\n"
+        
+    )
+    full_query = f"{prompt}{query}"
+    response = await model.ainvoke(full_query)
+    # Basic length validation for output (optional but helps detect model failures)
+    if not response or len(response.content.strip()) < 10:
+        raise RuntimeError("Generated code is unexpectedly short.")
+    return response.content 
 
 @mcp.tool()
 async def normal_query(query: str) -> str:
-    """Handle general queries that are not math-related"""
+    """Handle general queries that are  math-related"""
     response = await model.ainvoke(query)
     return response.content
 
@@ -89,7 +111,7 @@ async def code_generation(query: str) -> str:
 @mcp.tool()
 async def webcode_generation(query: str) -> str:
     """
-    Generate robust web development code  with comments and all necessary imports.
+    Generate robust web development code or landing page for website request  with comments and all necessary imports.
 
     Args:
         query (str): User's web application description.
