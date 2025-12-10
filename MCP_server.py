@@ -18,16 +18,21 @@ model = ChatGoogleGenerativeAI(
 
 mcp = FastMCP("math")
 
-# tool for maths operation 
+
+
+
+
+
+# tool for general query of user operation 
 @mcp.tool()
 async def normal_query(query: str) -> str:
-    """Handle general queries or the task that user ask with precision"""
+    """Handle general queries or the task that user ask with precision(essay,story,facts,questions,summary,reasoning) ect"""
     response = await model.ainvoke(query)
     return response.content
 
 
 
-  # Always mention necessary imports
+  # Always mention necessary 
 
 @mcp.tool()
 async def math_generation(query: str) -> str:
