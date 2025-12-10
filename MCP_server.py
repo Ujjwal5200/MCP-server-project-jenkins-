@@ -46,7 +46,7 @@ async def math_generation(query: str) -> str:
     if not query or not isinstance(query, str):
         raise ValueError("Query must be a non-empty string.")
 
-    # Prompt engineering as recommended by AI code generation experts.
+    # Prompt engineering as recommended by AI  experts.
     prompt = (
         "Act as an expert and experienced math resaercher with access to the latest libraries and best practices and tools.\n"
         "Generate logic with precise logic. "
