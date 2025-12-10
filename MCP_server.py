@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 from langchain_google_genai import ChatGoogleGenerativeAI
-from google.generativeai.exceptions import ResourceExhausted
+from google.api_core.exceptions import ResourceExhausted
 import os
 from dotenv import load_dotenv
 import asyncio

@@ -7,7 +7,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.prebuilt import ToolNode
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
-from google.generativeai.exceptions import ResourceExhausted
+from google.api_core.exceptions import ResourceExhausted
 
 import os
 from dotenv import load_dotenv

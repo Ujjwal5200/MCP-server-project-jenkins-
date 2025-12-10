@@ -12,6 +12,12 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')]) {
                     sh '''
+                        echo "=== Checking system resources ==="
+                        free -h
+
+                        echo "=== Updating package list ==="
+                        sudo apt-get update
+
                         echo "=== Creating .env for app ==="
                         cat > .env <<EOF
 GOOGLE_API_KEY=${GEMINI_API_KEY}

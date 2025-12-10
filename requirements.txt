@@ -3,6 +3,7 @@ nest-asyncio
 python-dotenv
 langchain-google-genai
 google-generativeai
+google-api-core
 langchain-mcp-adapters
 langgraph
 mcp
