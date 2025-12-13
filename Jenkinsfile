@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         APP_HOST = "<APP_PRIVATE_IP>"     
-        APP_USER = "ubuntu"
+        APP_USER = "ubuntu" 
         APP_DIR  = "/home/ubuntu/mcp-app"
         IMAGE    = "mcp-streamlit-app"
         CONTAINER = "mcp-app"
