@@ -1,39 +1,46 @@
 pipeline {
     agent any
 
+    environment {
+        APP_HOST = "<APP_PRIVATE_IP>"
+        APP_DIR  = "/home/ubuntu/app"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git'
+                git branch: 'main',
+                    url: 'https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git'
             }
         }
 
-        stage('Build & Deploy Docker') {
+        stage('Deploy to App EC2') {
             steps {
-                withCredentials([string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')]) {
-                    sh '''
-                        echo "=== Checking system resources ==="
-                        free -h
+                sshagent(['APP_EC2_SSH']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ubuntu@${APP_HOST} '
+                        set -e
+                        mkdir -p ${APP_DIR}
+                        cd ${APP_DIR}
 
-                        echo "=== Creating .env for app ==="
-                        cat > .env <<EOF
-GOOGLE_API_KEY=${GEMINI_API_KEY}
-GEMINI_API_KEY=${GEMINI_API_KEY}
-EOF
+                        if [ ! -d .git ]; then
+                            git clone https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git .
+                        else
+                            git pull origin main
+                        fi
 
-                        echo "=== Building Docker image ==="
-                        docker build -t mcp-streamlit-app .
+                        echo "GOOGLE_API_KEY=${GEMINI_API_KEY}" > .env
+                        echo "GEMINI_API_KEY=${GEMINI_API_KEY}" >> .env
 
-                        echo "=== Stopping old container (if exists) ==="
-                        docker stop mcp-streamlit-app || true
-                        docker rm mcp-streamlit-app || true
+                        docker stop mcp-app || true
+                        docker rm mcp-app || true
 
-                        echo "=== Running new container ==="
-                        docker run -d --name mcp-streamlit-app \
-                          -p 80:8501 \
+                        docker build -t mcp-app .
+                        docker run -d --name mcp-app \
                           --env-file .env \
-                          mcp-streamlit-app
-                    '''
+                          -p 80:8501 mcp-app
+                    '
+                    """
                 }
             }
         }
