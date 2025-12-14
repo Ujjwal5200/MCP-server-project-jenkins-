@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        APP_HOST  = "<APP_PRIVATE_IP>"      // e.g. 10.0.1.15
+        APP_HOST  = "<APP_PRIVATE_IP>"
         APP_USER  = "ubuntu"
         APP_DIR   = "/home/ubuntu/mcp-app"
         IMAGE     = "mcp-streamlit-app:latest"
@@ -30,43 +30,36 @@ pipeline {
                 ]) {
                     sshagent(credentials: ['APP_EC2_SSH']) {
                         sh '''
-                        set -e
+set -e
 
-                        ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} '
-                            set -e
+ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} "set -e
+mkdir -p ${APP_DIR}
+cd ${APP_DIR}
 
-                            echo "== Prepare directory =="
-                            mkdir -p ${APP_DIR}
-                            cd ${APP_DIR}
+if [ ! -d .git ]; then
+  git clone ${REPO_URL} .
+else
+  git fetch origin
+  git reset --hard origin/main
+fi
 
-                            echo "== Sync repository =="
-                            if [ ! -d .git ]; then
-                              git clone ${REPO_URL} .
-                            else
-                              git fetch origin
-                              git reset --hard origin/main
-                            fi
-
-                            echo "== Write env file =="
-                            cat > .env << ENV
+cat > .env << ENV
 GOOGLE_API_KEY=${GEMINI_API_KEY}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 ENV
 
-                            echo "== Docker redeploy =="
-                            docker stop ${CONTAINER} || true
-                            docker rm ${CONTAINER} || true
-                            docker build -t ${IMAGE} .
-                            docker run -d \
-                              --name ${CONTAINER} \
-                              --env-file .env \
-                              -p 80:8501 \
-                              --restart unless-stopped \
-                              ${IMAGE}
+docker stop ${CONTAINER} || true
+docker rm ${CONTAINER} || true
+docker build -t ${IMAGE} .
+docker run -d \
+  --name ${CONTAINER} \
+  --env-file .env \
+  -p 80:8501 \
+  --restart unless-stopped \
+  ${IMAGE}
 
-                            echo "== Running containers =="
-                            docker ps | grep ${CONTAINER}
-                        '
+docker ps | grep ${CONTAINER}
+"
                         '''
                     }
                 }
