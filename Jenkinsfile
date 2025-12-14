@@ -33,12 +33,13 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-                    sh '''#!/usr/bin/env bash
+                    sh '''
+#!/usr/bin/env bash
 set -euo pipefail
 
 chmod 600 "$SSH_KEY"
 
-ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$APP_HOST" << EOF
+ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$APP_HOST" << 'EOF'
 set -euo pipefail
 
 mkdir -p ${APP_DIR}
