@@ -33,7 +33,7 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-                   sh '''
+                  sh '''
 bash << 'SCRIPT'
 set -euo pipefail
 
