@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        APP_HOST  = "<APP_PRIVATE_IP>"
+        APP_HOST  = "<APP_PRIVATE_IP>"     // e.g. 10.0.1.15
         APP_USER  = "ubuntu"
         APP_DIR   = "/home/ubuntu/mcp-app"
         IMAGE     = "mcp-streamlit-app:latest"
@@ -29,15 +29,18 @@ pipeline {
                     string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')
                 ]) {
                     sshagent(credentials: ['APP_EC2_SSH']) {
+
                         sh '''
 set -e
 
-ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} 'bash -s' << EOF
+ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} bash -s << EOF
 set -e
 
+echo "== Prepare directory =="
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 
+echo "== Sync repository =="
 if [ ! -d .git ]; then
   git clone ${REPO_URL} .
 else
@@ -45,11 +48,13 @@ else
   git reset --hard origin/main
 fi
 
+echo "== Write env file =="
 cat > .env << ENV
 GOOGLE_API_KEY=${GEMINI_API_KEY}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 ENV
 
+echo "== Docker redeploy =="
 docker stop ${CONTAINER} || true
 docker rm ${CONTAINER} || true
 docker build -t ${IMAGE} .
@@ -60,7 +65,9 @@ docker run -d \
   --restart unless-stopped \
   ${IMAGE}
 
+echo "== Running containers =="
 docker ps | grep ${CONTAINER}
+
 EOF
                         '''
                     }
