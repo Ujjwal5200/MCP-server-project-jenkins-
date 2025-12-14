@@ -33,8 +33,8 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-                    sh '''
-#!/usr/bin/env bash
+                   sh '''
+bash << 'SCRIPT'
 set -euo pipefail
 
 chmod 600 "$SSH_KEY"
@@ -69,6 +69,7 @@ docker run -d \
 
 docker ps | grep ${CONTAINER}
 EOF
+SCRIPT
 '''
                 }
             }
