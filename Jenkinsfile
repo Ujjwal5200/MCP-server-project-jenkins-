@@ -32,7 +32,9 @@ pipeline {
                         sh '''
 set -e
 
-ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} "set -e
+ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} 'bash -s' << EOF
+set -e
+
 mkdir -p ${APP_DIR}
 cd ${APP_DIR}
 
@@ -59,7 +61,7 @@ docker run -d \
   ${IMAGE}
 
 docker ps | grep ${CONTAINER}
-"
+EOF
                         '''
                     }
                 }
