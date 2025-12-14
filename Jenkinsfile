@@ -1,16 +1,18 @@
 pipeline {
     agent any
+
     options {
         timestamps()
         disableConcurrentBuilds()
     }
 
     environment {
-        APP_HOST = "<APP_PRIVATE_IP>"     
-        APP_USER = "ubuntu" 
-        APP_DIR  = "/home/ubuntu/mcp-app"
-        IMAGE    = "mcp-streamlit-app"
+        APP_HOST  = "<APP_PRIVATE_IP>"
+        APP_USER  = "ubuntu"
+        APP_DIR   = "/home/ubuntu/mcp-app"
+        IMAGE     = "mcp-streamlit-app:latest"
         CONTAINER = "mcp-app"
+        REPO_URL  = "https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git"
     }
 
     stages {
@@ -21,82 +23,64 @@ pipeline {
             }
         }
 
-        stage('Validate Jenkins Environment') {
-            steps {
-                sh '''
-                  echo "Running on Jenkins node"
-                  whoami
-                  java -version
-                '''
-            }
-        }
-
-        stage('Deploy to App EC2') {
+        stage('Deploy') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')
+                    string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY'),
+                    sshUserPrivateKey(
+                        credentialsId: 'APP_EC2_SSH',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
                 ]) {
-                    sshagent(['APP_EC2_SSH']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} << 'EOF'
-                        set -euxo pipefail
+                    sh '''
+                        set -euo pipefail
+                        chmod 600 "$SSH_KEY"
 
-                        echo "== System check =="
-                        free -h
-                        docker --version
+                        ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$APP_HOST" << EOF
+                        set -euo pipefail
 
-                        echo "== App directory =="
+                        echo "== Prepare app directory =="
                         mkdir -p ${APP_DIR}
                         cd ${APP_DIR}
 
-                        echo "== Git sync =="
+                        echo "== Sync repo =="
                         if [ ! -d .git ]; then
-                            git clone https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git .
+                          git clone ${REPO_URL} .
                         else
-                            git fetch origin
-                            git reset --hard origin/main
+                          git fetch origin
+                          git reset --hard origin/main
                         fi
 
-                        echo "== Writing env =="
+                        echo "== Write env file =="
                         cat > .env << ENV
 GOOGLE_API_KEY=${GEMINI_API_KEY}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 ENV
 
-                        echo "== Docker cleanup =="
+                        echo "== Docker redeploy =="
                         docker stop ${CONTAINER} || true
                         docker rm ${CONTAINER} || true
+                        docker build -t ${IMAGE} .
+                        docker run -d \
+                          --name ${CONTAINER} \
+                          --env-file .env \
+                          -p 80:8501 \
+                          --restart unless-stopped \
+                          ${IMAGE}
 
-                        echo "== Docker build =="
-                        docker build -t ${IMAGE}:latest .
-
-                        echo "== Docker run =="
-                        docker run -d \\
-                          --name ${CONTAINER} \\
-                          --env-file .env \\
-                          -p 80:8501 \\
-                          --restart unless-stopped \\
-                          ${IMAGE}:latest
-
-                        echo "== Deployment complete =="
+                        echo "== Status =="
                         docker ps | grep ${CONTAINER}
                         EOF
-                        """
-                    }
+                    '''
                 }
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Deployment successful"
-        }
-        failure {
-            echo "❌ Deployment failed — check console logs ABOVE"
-        }
-        always {
-            cleanWs()
-        }
+        success { echo "✅ Deployment successful" }
+        failure { echo "❌ Deployment failed" }
+        always  { cleanWs() }
     }
 }
