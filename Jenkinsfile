@@ -1,33 +1,28 @@
 pipeline {
     agent any
+
     options {
         timestamps()
         disableConcurrentBuilds()
+        timeout(time: 20, unit: 'MINUTES')
     }
 
     environment {
-        APP_HOST = "<APP_PRIVATE_IP>"     // CHANGE THIS
+        APP_HOST = "<APP_PRIVATE_IP>"
         APP_USER = "ubuntu"
         APP_DIR  = "/home/ubuntu/mcp-app"
+
         IMAGE    = "mcp-streamlit-app"
         CONTAINER = "mcp-app"
+        PORT     = "8501"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
+                cleanWs()
                 checkout scm
-            }
-        }
-
-        stage('Validate Jenkins Environment') {
-            steps {
-                sh '''
-                  echo "Running on Jenkins node"
-                  whoami
-                  java -version
-                '''
             }
         }
 
@@ -37,51 +32,56 @@ pipeline {
                     string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')
                 ]) {
                     sshagent(['APP_EC2_SSH']) {
-                        sh """
+                        sh '''
+                        set -e
+
                         ssh -o StrictHostKeyChecking=no ${APP_USER}@${APP_HOST} << 'EOF'
                         set -euxo pipefail
 
-                        echo "== System check =="
-                        free -h
-                        docker --version
+                        echo "=== System Info ==="
+                        free -h || true
+                        df -h || true
 
-                        echo "== App directory =="
+                        echo "=== Preparing app directory ==="
                         mkdir -p ${APP_DIR}
                         cd ${APP_DIR}
 
-                        echo "== Git sync =="
+                        echo "=== Syncing repo ==="
                         if [ ! -d .git ]; then
-                            git clone https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git .
+                          git clone https://github.com/Ujjwal5200/MCP-server-project-jenkins-.git .
                         else
-                            git fetch origin
-                            git reset --hard origin/main
+                          git fetch origin
+                          git reset --hard origin/main
                         fi
 
-                        echo "== Writing env =="
+                        echo "=== Writing env file ==="
                         cat > .env << ENV
-GOOGLE_API_KEY=${GEMINI_API_KEY}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 ENV
 
-                        echo "== Docker cleanup =="
+                        echo "=== Stopping old container ==="
                         docker stop ${CONTAINER} || true
                         docker rm ${CONTAINER} || true
 
-                        echo "== Docker build =="
-                        docker build -t ${IMAGE}:latest .
+                        echo "=== Cleaning unused images ==="
+                        docker image prune -af || true
 
-                        echo "== Docker run =="
-                        docker run -d \\
-                          --name ${CONTAINER} \\
-                          --env-file .env \\
-                          -p 80:8501 \\
-                          --restart unless-stopped \\
-                          ${IMAGE}:latest
+                        echo "=== Building image (on APP EC2) ==="
+                        docker build --no-cache -t ${IMAGE} .
 
-                        echo "== Deployment complete =="
-                        docker ps | grep ${CONTAINER}
+                        echo "=== Running container ==="
+                        docker run -d \
+                          --name ${CONTAINER} \
+                          --env-file .env \
+                          -p 80:${PORT} \
+                          --restart unless-stopped \
+                          ${IMAGE}
+
+                        echo "=== Running containers ==="
+                        docker ps
+
                         EOF
-                        """
+                        '''
                     }
                 }
             }
@@ -93,7 +93,7 @@ ENV
             echo "✅ Deployment successful"
         }
         failure {
-            echo "❌ Deployment failed — check console logs ABOVE"
+            echo "❌ Deployment failed — check logs carefully"
         }
         always {
             cleanWs()
